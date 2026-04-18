@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JobShield AI - Fake Job Detector</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #0f172a; color: #e2e8f0; min-height: 100vh; display: flex; justify-content: center; align-items: center; }
+        .container { max-width: 700px; width: 90%; padding: 40px; }
+        h1 { font-size: 2.5rem; text-align: center; margin-bottom: 10px; }
+        h1 span { color: #38bdf8; }
+        .subtitle { text-align: center; color: #94a3b8; margin-bottom: 30px; }
+        textarea { width: 100%; height: 200px; padding: 15px; border-radius: 12px; border: 2px solid #334155; background: #1e293b; color: #e2e8f0; font-size: 14px; resize: vertical; }
+        textarea:focus { outline: none; border-color: #38bdf8; }
+        button { width: 100%; padding: 15px; margin-top: 15px; border-radius: 12px; border: none; background: #38bdf8; color: #0f172a; font-size: 16px; font-weight: bold; cursor: pointer; }
+        button:hover { background: #0ea5e9; }
+        .result { margin-top: 25px; padding: 25px; border-radius: 12px; text-align: center; }
+        .real { background: #064e3b; border: 2px solid #10b981; }
+        .fake { background: #7f1d1d; border: 2px solid #ef4444; }
+        .result h2 { font-size: 1.8rem; margin-bottom: 10px; }
+        .result p { font-size: 1.1rem; color: #cbd5e1; }
+        .suspicious { 
+        background: #451a03; 
+        border: 2px solid #f97316; 
+    }
+    .flag-item {
+        background: rgba(0,0,0,0.2);
+        padding: 8px 12px;
+        border-radius: 8px;
+        margin: 5px 0;
+        font-size: 0.9rem;
+        text-align: left;
+    }
+    .flags {
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid rgba(255,255,255,0.2);
+    }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛡️ Job<span>Shield</span> AI</h1>
+        <p class="subtitle">Paste any job posting — AI detects if it's Real or Fake</p>
+        <form method="POST" action="/predict">
+            <textarea name="job_text" placeholder="Paste the job description here...">{{ job_text if job_text }}</textarea>
+            <button type="submit">🔍 Analyze Job Posting</button>
+        </form>
+        {% if result %}
+<div class="result {{ 'fake' if 'FAKE' in result.prediction else ('suspicious' if 'SUSPICIOUS' in result.prediction else 'real') }}">
+    <h2>{{ result.prediction }}</h2>
+    <p>Confidence: {{ result.confidence }}</p>
+    <p>Risk Level: {{ result.risk_level }}</p>
+    
+    {% if result.red_flags %}
+    <div class="flags">
+        <h3 style="margin-top:15px; margin-bottom:10px;">🚩 Red Flags Detected ({{ result.flag_count }})</h3>
+        {% for flag in result.red_flags %}
+        <p class="flag-item">{{ flag }}</p>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p style="margin-top:10px; color:#86efac;">✅ No suspicious patterns detected</p>
+    {% endif %}
+</div>
+{% endif %}
+    </div>
+</body>
+</html>
